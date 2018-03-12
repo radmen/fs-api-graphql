@@ -24,15 +24,30 @@ const typeDefs = `
     }
 
     type Query {
-        list(dir: String): [File]!
+        list(
+            """
+            Name of the directory to be listed.
+
+            Default to servers CWD.
+            """
+            dir: String
+
+            """
+            Include hidden files
+            """
+            withHidden: Boolean = true
+        ): [File]!
     }
 `
 
 const resolvers = {
     Query: {
         list: (obj, args) => {
-            const { dir = process.cwd() } = args
+            const { dir = process.cwd(), withHidden } = args
+            const p = withHidden ? (file => file) : (({ path }) => !path.startsWith('.'))
+
             return readDir(dir)
+                .then(files => files.filter(p))
         }
     }
 }
