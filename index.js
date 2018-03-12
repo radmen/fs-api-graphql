@@ -24,13 +24,16 @@ const typeDefs = `
     }
 
     type Query {
-        list: [File]!
+        list(dir: String): [File]!
     }
 `
 
 const resolvers = {
     Query: {
-        list: () => readDir()
+        list: (obj, args) => {
+            const { dir = process.cwd() } = args
+            return readDir(dir)
+        }
     }
 }
 
