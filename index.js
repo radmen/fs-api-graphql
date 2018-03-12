@@ -16,7 +16,12 @@ const readDir = (dir = process.cwd()) => {
 }
 
 const typeDefs = `
-    type File { path: String!, content: String! }
+    type File { 
+        """
+        Name of file with extension
+        """
+        path: String!
+    }
 
     type Query {
         list: [File]!
@@ -26,10 +31,6 @@ const typeDefs = `
 const resolvers = {
     Query: {
         list: () => readDir()
-    },
-
-    File: {
-        content: () => 'lol'
     }
 }
 
