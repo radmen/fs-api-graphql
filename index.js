@@ -12,7 +12,7 @@ const files = [
 ]
 
 const typeDefs = `
-    type File { path: String! }
+    type File { path: String!, content: String! }
 
     type Query {
         list: [File]!
@@ -22,6 +22,10 @@ const typeDefs = `
 const resolvers = {
     Query: {
         list: () => files.map(path => ({ path }))
+    },
+
+    File: {
+        content: () => 'lol'
     }
 }
 
