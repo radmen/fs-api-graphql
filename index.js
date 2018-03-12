@@ -2,59 +2,21 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const { graphqlExpress, graphiqlExpress } = require('apollo-server-express')
 const { makeExecutableSchema } = require('graphql-tools')
-const fs = require('fs')
-const { promisify } = require('util')
+const fileSchema = require('./schema/file')
+const rootQuerySchema = require('./schema/rootQuery')
 
 const app = express()
 app.use(bodyParser.json())
 
-const readDir = (dir = process.cwd()) => {
-    return promisify(fs.readdir)(dir)
-        .then(
-            files => files.map(path => ({ path }))
-        )
-}
-
-const typeDefs = `
-    type File { 
-        """
-        Name of file with extension
-        """
-        path: String!
-    }
-
-    type Query {
-        list(
-            """
-            Name of the directory to be listed.
-
-            Default to servers CWD.
-            """
-            dir: String
-
-            """
-            Include hidden files
-            """
-            withHidden: Boolean = true
-        ): [File]!
-    }
-`
-
-const resolvers = {
-    Query: {
-        list: (obj, args) => {
-            const { dir = process.cwd(), withHidden } = args
-            const p = withHidden ? (file => file) : (({ path }) => !path.startsWith('.'))
-
-            return readDir(dir)
-                .then(files => files.filter(p))
-        }
-    }
-}
-
 const schema = makeExecutableSchema({
-    typeDefs,
-    resolvers
+    typeDefs: [
+        ...rootQuerySchema.types,
+        ...fileSchema.types
+    ],
+    resolvers: {
+        ...rootQuerySchema.resolvers,
+        ...fileSchema.resolvers
+    }
 })
 
 app.use('/graphql', graphqlExpress({ schema }))
