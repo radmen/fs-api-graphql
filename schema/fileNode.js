@@ -1,5 +1,5 @@
-const R = require('ramda')
 const readDir = require('../util/readDir')
+const { hiddenFilesFilter } = require('../util/filters')
 
 const types = `
   interface FileNode {
@@ -26,19 +26,13 @@ const queries = `
   ): [FileNode]!
 `
 
-const createHiddenFilesFilter = withHidden => 
-  R.filter(withHidden
-    ? R.identity
-    : R.compose(R.complement(R.startsWith('.')), R.prop('path'))
-  )
-
 const resolvers = {
   Query: {
     list: (_, args) => {
       const { dir = process.cwd(), withHidden } = args
 
       return readDir(dir)
-          .then(createHiddenFilesFilter(withHidden))
+          .then(hiddenFilesFilter(withHidden))
     }
   },
 

@@ -1,4 +1,5 @@
 const readDir = require('../util/readDir')
+const { hiddenFilesFilter } = require('../util/filters')
 
 const types = `
   type Dir implements FileNode {
@@ -10,14 +11,19 @@ const types = `
     """
     List of files inside directory
     """
-    files: [FileNode]!
+    files(
+      withHidden: Boolean = true
+    ): [FileNode]!
   }
 `
 
 const resolvers = {
   Dir: {
-    files (dir) {
+    files (dir, args) {
+      const { withHidden } = args
+
       return readDir(dir.path)
+        .then(hiddenFilesFilter(withHidden))
     }
   }
 }
