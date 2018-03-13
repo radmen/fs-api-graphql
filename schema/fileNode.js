@@ -32,7 +32,7 @@ const resolvers = {
       const { dir = process.cwd(), withHidden } = args
 
       return readDir(dir)
-          .then(hiddenFilesFilter(withHidden))
+        .then(hiddenFilesFilter(withHidden))
     }
   },
 
