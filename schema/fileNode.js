@@ -1,48 +1,30 @@
 const R = require('ramda')
-const fs = require('fs')
-const { promisify } = require('util')
-const File = require('../type/File')
-const Dir = require('../type/Dir')
+const readDir = require('../util/readDir')
 
 const types = `
   interface FileNode {
-        """
-        Name of file with extension
-        """
-        path: String!
+    """
+    Name of file with extension
+    """
+    path: String!
   }
 `
 
 const queries = `
   list(
-      """
-      Name of the directory to be listed.
+    """
+    Name of the directory to be listed.
 
-      Default to servers CWD.
-      """
-      dir: String
+    Default to servers CWD.
+    """
+    dir: String
 
-      """
-      Include hidden files
-      """
-      withHidden: Boolean = true
+    """
+    Include hidden files
+    """
+    withHidden: Boolean = true
   ): [FileNode]!
 `
-
-const stat = promisify(fs.stat)
-
-const isDir = path => stat(path)
-  .then(stats => stats.isDirectory())
-
-const resolveFileNode = path => isDir(path)
-  .then(directory => directory ? new Dir(path) : new File(path))
-
-const readDir = (dir = process.cwd()) => {
-  return promisify(fs.readdir)(dir)
-    .then(
-        files => Promise.all(files.map(resolveFileNode))
-    )
-}
 
 const createHiddenFilesFilter = withHidden => 
   R.filter(withHidden
