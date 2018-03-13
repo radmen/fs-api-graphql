@@ -2,7 +2,9 @@ const R = require('ramda')
 const { makeExecutableSchema } = require('graphql-tools')
 
 const modules = [
-  require('./file')
+  require('./fileNode'),
+  require('./file'),
+  require('./dir')
 ]
 
 const mergeSchema = R.join('\n')

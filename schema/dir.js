@@ -1,14 +1,14 @@
 const types = `
-  type File implements FileNode { 
+  type Dir implements FileNode {
     """
     Name of file with extension
     """
     path: String!
 
     """
-    Contents of file
+    List of files inside directory
     """
-    contents: String!
+    files: [FileNode]!
   }
 `
 
